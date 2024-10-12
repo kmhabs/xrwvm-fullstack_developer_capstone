@@ -12,8 +12,12 @@ import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
+<<<<<<< HEAD
 from .models import CarMake, CarModel
 from .restapis import get_request, analyze_review_sentiments, post_review
+=======
+
+>>>>>>> parent of ac0e572 (Build CarModel and CarMake Django Models)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -108,6 +112,7 @@ def get_dealer_details(request, dealer_id):
 
 # Create a `add_review` view to submit a review
 def add_review(request):
+<<<<<<< HEAD
     if(request.user.is_anonymous == False):
         data = json.loads(request.body)
         try:
@@ -129,3 +134,17 @@ def get_cars(request):
         cars.append({"CarModel": car_model.name, "CarMake": car_model.car_make.name})
     return JsonResponse({"CarModels":cars})
 
+=======
+    if request.method == 'POST':
+        dealer_id = request.POST.get('dealer_id')
+        review = request.POST.get('review')
+        rating = request.POST.get('rating')
+
+        # Simulate saving the review (normally save it in DB or call an API)
+        print(f'Review: {review}, Rating: {rating}, Dealer ID: {dealer_id}')
+        
+        return redirect('get_dealer_reviews', dealer_id=dealer_id)  # Redirect to reviews page
+
+    # Render the review form if it's a GET request
+    return render(request, 'add_review.html')
+>>>>>>> parent of ac0e572 (Build CarModel and CarMake Django Models)

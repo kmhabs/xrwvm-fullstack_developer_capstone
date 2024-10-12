@@ -8,6 +8,7 @@ urlpatterns = [
     path('register/', views.registration, name='register'),  
     path(route='login', view=views.login_user, name='login'),
     path('logout/', views.logout_request, name='logout'), 
+<<<<<<< HEAD
     
     path(route='reviews/dealer/<int:dealer_id>', view=views.get_dealer_reviews, name='dealer_details'),
     path(route='add_review', view=views.add_review, name='add_review'),
@@ -17,4 +18,7 @@ urlpatterns = [
     path(route='dealer/<int:dealer_id>', view=views.get_dealer_details, name='dealer_details'),
 
     path(route='get_cars', view=views.get_cars, name ='getcars'),
+=======
+    path('dealer/<int:dealer_id>/', views.get_dealer_details, name='get_dealer_details'),  
+>>>>>>> parent of ac0e572 (Build CarModel and CarMake Django Models)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
