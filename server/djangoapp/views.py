@@ -1,5 +1,3 @@
-# Uncomment the required imports before adding the code
-
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
@@ -21,20 +19,16 @@ from .models import CarMake, CarModel
 logger = logging.getLogger(__name__)
 
 
-# Create your views here.
-
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
 def login_user(request):
-    # Get username and password from request.POST dictionary
     data = json.loads(request.body)
     username = data['userName']
     password = data['password']
-    # Try to check if provide credential can be authenticated
+
     user = authenticate(username=username, password=password)
     data = {"userName": username}
     if user is not None:
-        # If user is valid, call login method to login current user
         login(request, user)
         data = {"userName": username, "status": "Authenticated"}
     return JsonResponse(data)
@@ -61,7 +55,6 @@ def registration(request):
             last_name = data.get('lastName')
             email = data.get('email')
 
-            # Check if any fields are missing
             if not all([username, password, first_name, last_name, email]):
                 return JsonResponse({"error": "Missing required fields"}, status=400)
 
@@ -73,13 +66,8 @@ def registration(request):
             if User.objects.filter(email=email).exists():
                 return JsonResponse({"error": "Email already registered"}, status=400)
 
-            # Create a new user
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, password=password, email=email)
-
-            # Log the user in after registration
             login(request, user)
-
-            # Return successful registration
             return JsonResponse({"userName": username, "status": "Authenticated"}, status=201)
 
         except json.JSONDecodeError:
@@ -87,47 +75,48 @@ def registration(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
     
-# # Update the `get_dealerships` view to render the index page with
-# a list of dealerships
-def get_dealerships(request):
-    dealerships = [
-        {'id': 1, 'name': 'Dealer One', 'location': 'City A'},
-        {'id': 2, 'name': 'Dealer Two', 'location': 'City B'},
-        # Add more dealership data or fetch from API/DB
-    ]
-
-    return render(request, 'index.html', {'dealerships': dealerships})
+#Update the `get_dealerships` render list of dealerships all by default, particular state if state is passed
+def get_dealerships(request, state="All"):
+    if(state == "All"):
+        endpoint = "/fetchDealers"
+    else:
+        endpoint = "/fetchDealers/"+state
+    dealerships = get_request(endpoint)
+    return JsonResponse({"status":200,"dealers":dealerships})
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 def get_dealer_reviews(request, dealer_id):
-    # Simulate dealer reviews or fetch from API/DB
-    reviews = [
-        {'review': 'Great service!', 'rating': 5, 'dealer_id': dealer_id},
-        {'review': 'Not bad', 'rating': 3, 'dealer_id': dealer_id},
-    ]
+    if(dealer_id):
+        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
+        reviews = get_request(endpoint)
+        for review_detail in reviews:
+            response = analyze_review_sentiments(review_detail['review'])
+            print(response)
+            review_detail['sentiment'] = response['sentiment']
+        return JsonResponse({"status":200,"reviews":reviews})
+    else:
+        return JsonResponse({"status":400,"message":"Bad Request"})
 
-    return render(request, 'dealer_reviews.html', {'reviews': reviews, 'dealer_id': dealer_id})
 # Create a `get_dealer_details` view to render the dealer details
 def get_dealer_details(request, dealer_id):
-    # Simulate dealer details or fetch from API/DB
-    dealer = {'id': dealer_id, 'name': 'Dealer One', 'location': 'City A'}
-    
-    return render(request, 'dealer_details.html', {'dealer': dealer})
+    if(dealer_id):
+        endpoint = "/fetchDealer/"+str(dealer_id)
+        dealership = get_request(endpoint)
+        return JsonResponse({"status":200,"dealer":dealership})
+    else:
+        return JsonResponse({"status":400,"message":"Bad Request"})
 
 # Create a `add_review` view to submit a review
 def add_review(request):
-    if request.method == 'POST':
-        dealer_id = request.POST.get('dealer_id')
-        review = request.POST.get('review')
-        rating = request.POST.get('rating')
-
-        # Simulate saving the review (normally save it in DB or call an API)
-        print(f'Review: {review}, Rating: {rating}, Dealer ID: {dealer_id}')
-        
-        return redirect('get_dealer_reviews', dealer_id=dealer_id)  # Redirect to reviews page
-
-    # Render the review form if it's a GET request
-    return render(request, 'add_review.html')
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
+        try:
+            response = post_review(data)
+            return JsonResponse({"status":200})
+        except:
+            return JsonResponse({"status":401,"message":"Error in posting review"})
+    else:
+        return JsonResponse({"status":403,"message":"Unauthorized"})
 
 def get_cars(request):
     count = CarMake.objects.filter().count()
