@@ -12,8 +12,10 @@ class CarMake(models.Model):
         blank=True,
         null=True,
         validators=[
-            MinValueValidator(1886),  # Cars were invented in 1886
-            MaxValueValidator(now().year),  # Founding year can't be in the future
+            MinValueValidator(1886),  
+            # Cars were invented in 1886
+            # Founding year can't be in the future
+            MaxValueValidator(now().year),
         ],
     )
 
@@ -39,8 +41,10 @@ class CarModel(models.Model):
         validators=[
             MinValueValidator(
                 1886
-            ),  # Cars were invented in 1886, so minimum value is 1886
-            MaxValueValidator(now().year),  # Ensure the year is not in the future
+            ),
+            # Cars were invented in 1886, so minimum value is 1886
+            # Ensure the year is not in the future
+            MaxValueValidator(now().year),
         ]
     )
 

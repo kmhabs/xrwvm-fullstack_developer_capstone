@@ -1,10 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import logout
-from django.contrib import messages
-from datetime import datetime
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
@@ -14,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
 from .models import CarMake, CarModel
 from .restapis import get_request, analyze_review_sentiments, post_review
-
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -59,15 +53,24 @@ def registration(request):
             email = data.get("email")
 
             if not all([username, password, first_name, last_name, email]):
-                return JsonResponse({"error": "Missing required fields"}, status=400)
+                return JsonResponse(
+                    {"error": "Missing required fields"},
+                    status=400
+                )
 
             # Check if the username already exists
             if User.objects.filter(username=username).exists():
-                return JsonResponse({"error": "Username already exists"}, status=400)
+                return JsonResponse(
+                    {"error": "Username already exists"},
+                    status=400
+                )
 
             # Check if the email already exists
             if User.objects.filter(email=email).exists():
-                return JsonResponse({"error": "Email already registered"}, status=400)
+                return JsonResponse(
+                    {"error": "Email already registered"},
+                    status=400
+                )
 
             user = User.objects.create_user(
                 username=username,
@@ -78,16 +81,24 @@ def registration(request):
             )
             login(request, user)
             return JsonResponse(
-                {"userName": username, "status": "Authenticated"}, status=201
+                {"userName": username, "status": "Authenticated"},
+                status=201
             )
 
         except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+            return JsonResponse(
+                {"error": "Invalid JSON format"},
+                status=400
+            )
 
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+    return JsonResponse(
+        {"error": "Invalid request method"},
+        status=405
+    )
 
 
-# Update the `get_dealerships` render list of dealerships all by default, particular state if state is passed
+# Update the `get_dealerships` render list of dealerships all by default,
+# particular state if state is passed
 def get_dealerships(request, state="All"):
     if state == "All":
         endpoint = "/fetchDealers"
@@ -146,21 +157,33 @@ def add_review(request):
                     )
 
                 # Handle the review submission logic
-                response = post_review(data)  # Ensure post_review is defined elsewhere
+                # Ensure post_review is defined elsewhere
+                post_review(data)
 
-                return JsonResponse(
-                    {"status": 200, "message": "Review posted successfully."}
-                )
+                return JsonResponse({
+                    "status": 200,
+                    "message": "Review posted successfully."
+                })
             except json.JSONDecodeError:
-                return JsonResponse({"status": 400, "message": "Invalid JSON data."})
+                return JsonResponse({
+                    "status": 400,
+                    "message": "Invalid JSON data."
+                })
             except Exception as e:
-                return JsonResponse(
-                    {"status": 500, "message": f"Error in posting review: {str(e)}"}
-                )
+                return JsonResponse({
+                    "status": 500,
+                    "message": f"Error in posting review: {str(e)}"
+                })
         else:
-            return JsonResponse({"status": 403, "message": "Unauthorized"})
+            return JsonResponse({
+                "status": 403,
+                "message": "Unauthorized"
+            })
     else:
-        return JsonResponse({"status": 405, "message": "Method not allowed"})
+        return JsonResponse({
+            "status": 405,
+            "message": "Method not allowed"
+        })
 
 
 def get_cars(request):
@@ -174,7 +197,10 @@ def get_cars(request):
 
         car_models = CarModel.objects.select_related("car_make")
         cars = [
-            {"CarModel": car_model.name, "CarMake": car_model.car_make.name}
+            {
+                "CarModel": car_model.name,
+                "CarMake": car_model.car_make.name
+            }
             for car_model in car_models
         ]
         print("get cars: ", cars)
@@ -182,7 +208,8 @@ def get_cars(request):
         return JsonResponse({"CarModels": cars})
 
     except Exception as e:
-        print(f"Error fetching car models: {e}")  # Log the error for debugging
+        print(f"Error fetching car models: {e}")
         return JsonResponse(
-            {"error": "An error occurred while fetching car models."}, status=500
+            {"error": "An error occurred while fetching car models."},
+            status=500
         )
