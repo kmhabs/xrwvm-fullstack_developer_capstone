@@ -12,7 +12,7 @@ class CarMake(models.Model):
         blank=True,
         null=True,
         validators=[
-            MinValueValidator(1886),  
+            MinValueValidator(1886),
             # Cars were invented in 1886
             # Founding year can't be in the future
             MaxValueValidator(now().year),
