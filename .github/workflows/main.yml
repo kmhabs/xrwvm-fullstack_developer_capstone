@@ -45,8 +45,9 @@ jobs:
       run: npm install jshint --global
     - name: Run Linter
       run: |
-        # This command finds all JavaScript files recursively and runs JSHint on them
-        find . -name "*.js" -exec jshint {} +
+        # This command runs ESLint on all JavaScript and JSX files in the specified directory
+        npx eslint ./server/frontend/src --ext .js,.jsx
+
     - name: Display Linting Errors
       if: failure()
       run: |
