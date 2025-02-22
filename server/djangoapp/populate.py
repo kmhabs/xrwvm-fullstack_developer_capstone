@@ -89,3 +89,6 @@ def initiate():
             type=data['type'],
             year=data['year']
         )
+
+
+# Add a newline at the end of the file
