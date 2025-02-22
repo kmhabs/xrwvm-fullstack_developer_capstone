@@ -47,6 +47,3 @@ urlpatterns = [
             'path': 'manifest.json'}
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-
-# Add a newline at the end of the file

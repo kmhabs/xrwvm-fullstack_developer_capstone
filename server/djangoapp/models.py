@@ -53,5 +53,3 @@ class CarModel(models.Model):
 
     def __str__(self):
         return self.name
-
-# Add a newline at the end of the file

@@ -171,8 +171,3 @@ def add_review(request):
                 "status": 403,
                 "message": "Unauthorized"
             })
-
-
-
-
-# Add a newline at the end of the file

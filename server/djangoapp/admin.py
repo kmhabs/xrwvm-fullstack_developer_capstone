@@ -17,4 +17,3 @@ from .models import CarMake, CarModel
 # Registering models with their respective admins
 admin.site.register(CarMake)
 admin.site.register(CarModel)
-# Add a newline at the end of the file

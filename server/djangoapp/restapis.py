@@ -48,5 +48,3 @@ def post_review(data_dict):
         print(f"Network exception occurred: {e}")
         return {"status": 500, "message": "Internal Server Error"}
 
-
-# Add a newline at the end of the file
