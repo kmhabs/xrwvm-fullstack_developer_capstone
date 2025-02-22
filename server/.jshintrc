@@ -1,3 +1,11 @@
 {
-  "esversion": 6
+  "esversion": 6,
+  "expr": true,
+  "browser": true,
+  "devel": true,
+  "jquery": true,
+  "node": true,
+  "globals": {
+    "React": true
+  }
 }
